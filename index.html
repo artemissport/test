@@ -97,7 +97,7 @@
         
         .analysis-card.empathy { background-color: #f0fdf4; border-left-color: #2E8B57; }
         .analysis-card.matrix { background-color: #fff; border-left-color: #3498db; } 
-        .analysis-card.warning { border-left-color: var(--accent-color); background-color: #fffaf5; } /* 黃色警告卡片 */
+        .analysis-card.warning { border-left-color: var(--accent-color); background-color: #fffaf5; } 
         .analysis-card.hormone { background-color: #fcf3f8; border-left-color: #e84393; } 
         
         .analysis-icon {
@@ -141,7 +141,7 @@
 
     <header>
         <h1>ABC 瘦身法</h1>
-        <div class="subtitle">瘦是健康的附加價值，我們陪你找回自主權</div>
+        <div class="subtitle">瘦是健康的附加價值，我們陪您找回自主權</div>
     </header>
 
     <div class="container">
@@ -260,7 +260,7 @@
                     </div>
                     <div class="radio-option" onclick="toggleCheckbox(this)">
                         <span class="radio-icon">🧘</span>
-                        <span>瑜珈/皮拉提斯</span>
+                        <span>伸展放鬆</span>
                         <input type="checkbox" name="type" value="yoga">
                     </div>
                 </div>
@@ -370,7 +370,7 @@
             // 建議內容組合
             let adviceHTML = "";
 
-            // A. 目標合理性分析 (移到最上方)
+            // A. 目標合理性分析 (最優先顯示)
             const safeWeeklyLoss = currentWeight * 0.009; // 約 0.9% 體重
             const maxSafeLoss = safeWeeklyLoss * 12; // 12週
             
@@ -396,7 +396,7 @@
                 「我們要的是瘦一輩子，而不是瘦一陣子」，這才是最健康的節奏。`, "warning");
             }
 
-            // B. 情感同理 (回應困擾)
+            // B. 情感同理 (回應困擾) - 改用 "您"
             struggles.forEach(s => {
                 adviceHTML += getStruggleAdvice(s);
             });
@@ -452,7 +452,7 @@
             
             adviceHTML += createAdviceCard("📊", strategyTitle, strategyContent, "matrix");
 
-            // D. 運動策略
+            // D. 運動策略 (柔性建議)
             let exAdvice = "";
             let exTitle = "👟 運動策略：循序漸進";
 
@@ -464,14 +464,17 @@
                 exAdvice += `<p><strong>🔥 調整內容：包含肌力</strong><br>您的活動量很足夠！請確保訓練菜單中有包含肌力訓練（如深蹲），這能保護代謝引擎。從每週 3 天深蹲 30 下開始嘗試。</p>`;
             }
 
+            // 修改：運動類型建議優化
             if (exerciseTypes.includes('strength')) {
-                exAdvice += `<p><strong>✅ 肌力訓練</strong>：選擇深蹲、伏地挺身等能持續執行的動作即可。</p>`;
+                // 伏地挺身 -> 核心訓練
+                exAdvice += `<p><strong>✅ 肌力訓練</strong>：選擇深蹲、核心訓練等能持續執行的動作即可。</p>`;
             }
             if (exerciseTypes.includes('cardio')) {
                 exAdvice += `<p><strong>✅ 有氧運動</strong>：試試「超慢跑」，它就像動態的靜心，跑 10 分鐘也很好。</p>`;
             }
             if (exerciseTypes.includes('yoga') || struggles.includes('health')) {
-                exAdvice += `<p><strong>✅ 瑜珈/皮拉提斯</strong>：安排在睡前 10 分鐘，當作「身體的保養」。</p>`;
+                // 瑜珈/皮拉提斯 -> 伸展放鬆
+                exAdvice += `<p><strong>✅ 伸展放鬆</strong>：安排在睡前 10 分鐘，當作「身體的保養」。</p>`;
             }
 
             adviceHTML += createAdviceCard(exTitle.split(" ")[0], exTitle.split(" ")[1], exAdvice);
@@ -537,21 +540,21 @@
             document.getElementById('lineBtn').href = `https://line.me/R/ti/p/${lineId}?text=${encodeURIComponent(lineMsg)}`;
         }
 
-        // --- 針對困擾的專屬建議生成器 ---
+        // --- 針對困擾的專屬建議生成器 (改為 "您") [Cite: Source 1, 15 - Warm tone] ---
         function getStruggleAdvice(struggle) {
             let icon = ""; let title = ""; let content = "";
             if (struggle === 'confidence') {
                 icon = "❤️"; title = "「體重數字讓我沒自信」";
-                content = `<p>美美也曾經因為體重差點破百而被醫美診所「退貨」，那種挫折感我們都懂。但妳知道嗎？<strong>妳的價值不是由體重的增減來決定的。</strong>我們有很多學員，體重沒有掉很多，但整個人看起來完全不一樣，因為她們學會了建立可持續的生活方式。</p>`;
+                content = `<p>美美也曾經因為體重差點破百而被醫美診所「退貨」，那種挫折感我們都懂。但您知道嗎？<strong>您的價值不是由體重的增減來決定的。</strong>我們有很多學員，體重沒有掉很多，但整個人看起來完全不一樣，因為她們學會了建立可持續的生活方式。</p>`;
             } else if (struggle === 'health') {
                 icon = "🩺"; title = "「健檢出現紅字，擔心健康」";
-                content = `<p>妳的擔心很有道理，健康真的是最重要的！體重背後反映的是整體健康狀況。跟著 ABC 系統 3 個月後，不只體重下降，血壓、血脂等健康指標通常也能全面改善。瘦下來將是身體健康後最棒的附加價值。</p>`;
+                content = `<p>您的擔心很有道理，健康真的是最重要的！體重背後反映的是整體健康狀況。跟著 ABC 系統 3 個月後，不只體重下降，血壓、血脂等健康指標通常也能全面改善。瘦下來將是身體健康後最棒的附加價值。</p>`;
             } else if (struggle === 'yoyo') {
                 icon = "📉"; title = "「試過很多方法都失敗，復胖很挫折」";
-                content = `<p>我太懂這種感覺了！<strong>過去的失敗不是妳的錯，只是妳用錯方法了。</strong>95%的傳統減重方法（節食、藥物）都會復胖，因為它們無法持續。ABC 系統不靠意志力，而是重點在「刻意加進更多對的東西」，讓身體自然配合。</p>`;
+                content = `<p>我太懂這種感覺了！<strong>過去的失敗不是您的錯，只是您用錯方法了。</strong>95%的傳統減重方法（節食、藥物）都會復胖，因為它們無法持續。ABC 系統不靠意志力，而是重點在「刻意加進更多對的東西」，讓身體自然配合。</p>`;
             } else if (struggle === 'busy') {
                 icon = "🍱"; title = "「工作忙碌，外食多，不知道怎麼吃」";
-                content = `<p>忙碌的生活、外食族的困擾我們完全理解。但<strong>「外食不是藉口，而是學會聰明選擇的機會」</strong>！ABC 系統有專門的外食攻略：便當店多點燙青菜、調整進食順序、避開油炸。我們的營養師團隊會每天幫妳看外食選擇。</p>`;
+                content = `<p>忙碌的生活、外食族的困擾我們完全理解。但<strong>「外食不是藉口，而是學會聰明選擇的機會」</strong>！ABC 系統有專門的外食攻略：便當店多點燙青菜、調整進食順序、避開油炸。我們的營養師團隊會每天幫您看外食選擇。</p>`;
             }
             return `<div class="analysis-card empathy"><div class="analysis-icon">${icon}</div><div class="analysis-content"><h4>${title}</h4>${content}</div></div>`;
         }
