@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABC 瘦身法 - 您的專屬健康報告</title>
+    <title>ABC 瘦身法 - 您的全方位代謝分析報告</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -22,7 +22,7 @@
         header {
             position: relative;
             background: linear-gradient(rgba(46, 139, 87, 0.9), rgba(30, 94, 58, 0.8)), 
-                        url('https://images.unsplash.com/photo-1544367563-12123d8d5e64?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+                        url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
             color: white; text-align: center; padding: 80px 20px 100px;
             border-radius: 0 0 50% 50% / 20px;
         }
@@ -30,10 +30,10 @@
         .subtitle { font-size: 1.1rem; margin-top: 10px; opacity: 0.95; }
 
         /* --- Container --- */
-        .container { max-width: 720px; margin: -60px auto 40px; padding: 0 20px; position: relative; z-index: 10; }
+        .container { max-width: 760px; margin: -60px auto 40px; padding: 0 20px; position: relative; z-index: 10; }
         .card { background: #fff; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); margin-bottom: 30px; }
 
-        /* --- Form --- */
+        /* --- Form Elements --- */
         .form-title h3 { color: var(--primary-color); text-align: center; margin-bottom: 5px; }
         .form-title p { text-align: center; color: #777; font-size: 0.9rem; margin-bottom: 30px; }
         
@@ -50,11 +50,9 @@
         }
         input:focus { border-color: var(--primary-color); outline: none; background-color: #fff; }
 
-        /* --- Radio & Checkbox Styles --- */
+        /* --- Radio & Checkbox --- */
         .radio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .radio-grid-2 { grid-template-columns: repeat(2, 1fr); } 
-        
-        /* 針對長文字選項的格線設計 */
         .radio-grid-full { grid-template-columns: 1fr; gap: 12px; }
 
         .radio-option {
@@ -63,11 +61,7 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             position: relative;
         }
-        
-        /* 長選項文字靠左對齊 */
-        .radio-grid-full .radio-option {
-            flex-direction: row; justify-content: flex-start; text-align: left;
-        }
+        .radio-grid-full .radio-option { flex-direction: row; justify-content: flex-start; text-align: left; }
 
         .radio-option:hover { border-color: var(--primary-color); background-color: var(--secondary-color); }
         .radio-option.selected {
@@ -76,15 +70,10 @@
         }
         .radio-icon { font-size: 1.4rem; margin-bottom: 5px; display: block; }
         .radio-grid-full .radio-icon { margin: 0 15px 0 0; font-size: 1.6rem; }
-        
         .radio-option input { display: none; }
 
-        /* Highlight Input */
-        .highlight-input input {
-            border-color: var(--primary-color); background-color: #f0fdf4; font-weight: bold; color: var(--primary-dark);
-        }
+        .highlight-input input { border-color: var(--primary-color); background-color: #f0fdf4; font-weight: bold; color: var(--primary-dark); }
 
-        /* --- Button --- */
         .btn-submit {
             width: 100%; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white; border: none; padding: 18px; font-size: 1.2rem; font-weight: 700; border-radius: 50px;
@@ -99,19 +88,17 @@
         .result-header h2 { color: var(--primary-color); margin-bottom: 5px; }
         .chart-box { height: 320px; margin-bottom: 30px; }
 
-        /* --- Analysis Card --- */
+        /* --- Analysis Card (New Matrix Style) --- */
         .analysis-card {
             background: #fff; border-radius: 16px; padding: 25px; margin-bottom: 25px;
             border-left: 6px solid var(--primary-color); box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex; align-items: flex-start;
         }
         
-        .analysis-card.empathy {
-            background-color: #f0fdf4; 
-            border-left-color: #2E8B57;
-        }
-        
+        .analysis-card.empathy { background-color: #f0fdf4; border-left-color: #2E8B57; }
+        .analysis-card.strategy { background-color: #fff; border-left-color: #3498db; } /* 策略藍 */
         .analysis-card.warning { border-left-color: var(--accent-color); background-color: #fffaf5; }
+        .analysis-card.hormone { background-color: #fcf3f8; border-left-color: #e84393; } /* 荷爾蒙粉 */
         
         .analysis-icon {
             font-size: 2rem; margin-right: 20px; background: #fff;
@@ -121,12 +108,15 @@
         }
         
         .analysis-content { flex: 1; }
-        .analysis-content h4 { margin: 0 0 10px 0; color: var(--primary-dark); font-size: 1.15rem; font-weight: 700; }
+        .analysis-content h4 { margin: 0 0 10px 0; color: #2c3e50; font-size: 1.15rem; font-weight: 700; }
         .analysis-content p { margin: 0 0 10px 0; font-size: 0.95rem; color: #444; line-height: 1.7; }
         .analysis-content ul { margin: 5px 0 10px 20px; padding: 0; color: #555; }
         .analysis-content li { margin-bottom: 5px; }
+        
+        /* Highlight specific terms in text */
+        .highlight-term { color: var(--primary-dark); font-weight: bold; background: #e8f5e9; padding: 0 4px; border-radius: 4px; }
 
-        /* --- CTA --- */
+        /* CTA */
         .cta-area {
             text-align: center; padding: 35px; background: linear-gradient(135deg, #fff 0%, #f0fdf4 100%);
             border: 2px dashed var(--primary-color); border-radius: 20px; margin-top: 30px;
@@ -158,7 +148,7 @@
         <div class="card" id="inputForm">
             <div class="form-title">
                 <h3>建立您的專屬健康檔案</h3>
-                <p>告訴我們您的狀況，讓我們為您量身打造 ABC 減重路徑</p>
+                <p>輸入數據，ABC 系統將為您匹配最適合的代謝優化策略</p>
             </div>
             
             <div class="form-group">
@@ -302,13 +292,13 @@
                 </div>
             </div>
 
-            <button class="btn-submit" onclick="analyzeResult()">開始分析我的專屬計畫 ➔</button>
+            <button class="btn-submit" onclick="analyzeResult()">生成我的專屬策略報告 ➔</button>
         </div>
 
         <div class="card" id="resultSection">
             <div class="result-header">
-                <h2><span id="resultName"></span>，您的 3 個月潛能分析</h2>
-                <p>ABC 系統大數據運算結果</p>
+                <h2><span id="resultName"></span>，您的全方位代謝報告</h2>
+                <p>基於 ABC 瘦身法核心變數交叉分析</p>
             </div>
 
             <div class="chart-box">
@@ -318,8 +308,8 @@
             <div id="adviceContainer"></div>
 
             <div class="cta-area">
-                <h3 style="margin: 0;">給自己一個改變的機會</h3>
-                <p>加入官方 LINE，取得營養師建議與課程優惠</p>
+                <h3 style="margin: 0;">改變，從現在開始</h3>
+                <p>索取完整報告與您的專屬飲食菜單</p>
                 <a href="#" target="_blank" class="btn-line" id="lineBtn">
                     加入LINE索取更多課程資訊
                 </a>
@@ -328,7 +318,7 @@
     </div>
 
     <script>
-        // 單選邏輯
+        // 選單互動邏輯
         function selectRadio(element, groupName) {
             document.querySelectorAll(`input[name="${groupName}"]`).forEach(input => {
                 input.closest('.radio-option').classList.remove('selected');
@@ -338,7 +328,6 @@
             element.querySelector('input').checked = true;
         }
 
-        // 複選邏輯 (Checkbox)
         function toggleCheckbox(element) {
             const checkbox = element.querySelector('input');
             checkbox.checked = !checkbox.checked;
@@ -346,13 +335,12 @@
             else element.classList.remove('selected');
         }
 
-        // 獲取複選值
         function getCheckedValues(name) {
             const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
             return Array.from(checkboxes).map(cb => cb.value);
         }
 
-        // 核心分析函式
+        // --- 核心運算函式 ---
         function analyzeResult() {
             // 1. 資料獲取
             const nickname = document.getElementById('nickname').value || "學員";
@@ -365,75 +353,159 @@
             const dietType = document.querySelector('input[name="diet"]:checked')?.value;
             const exerciseFreq = document.querySelector('input[name="freq"]:checked')?.value;
             const exerciseTypes = getCheckedValues('type');
-            const struggles = getCheckedValues('struggle'); // 獲取困擾 (陣列)
+            const struggles = getCheckedValues('struggle');
 
             // 驗證
             if (!currentWeight || !goalLoss || !dietType || !exerciseFreq || !height || !age || !gender || struggles.length === 0) {
-                alert("請填寫完整資料（包含最後一題困擾），讓我們能提供最準確的分析！");
+                alert("請填寫完整資料（包含困擾），以獲得最精準的策略報告！");
                 return;
             }
 
-            // 切換畫面
+            // 轉場
             document.getElementById('inputForm').style.display = 'none';
             document.getElementById('resultSection').style.display = 'block';
             document.getElementById('resultName').innerText = nickname;
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // 2. 數據運算
-            const safeWeeklyLoss = currentWeight * 0.009; 
-            const weeks = 12;
-            const maxSafeLoss = safeWeeklyLoss * weeks;
-            
-            let finalWeight;
-            let adviceHTML = "";
-            let isRealistic = true;
+            // 基礎代謝率估算 (Mifflin-St Jeor 公式)
+            let bmr;
+            if (gender === 'Male') {
+                bmr = (10 * currentWeight) + (6.25 * height) - (5 * age) + 5;
+            } else {
+                bmr = (10 * currentWeight) + (6.25 * height) - (5 * age) - 161;
+            }
+            // 每日消耗熱量估算 TDEE (簡單係數)
+            let tdeeFactor = 1.2; // 久坐
+            if (exerciseFreq === 'light') tdeeFactor = 1.375;
+            if (exerciseFreq === 'active') tdeeFactor = 1.55;
+            const tdee = Math.round(bmr * tdeeFactor);
 
-            // 3. 優先生成：針對「每一個困擾」的溫暖建議 (迴圈生成) [Cite: Source 1, Source 15 - Personalization and Empathy]
+            // 2. 建議生成順序：情感同理 -> 核心策略矩陣 -> 運動修正 -> 荷爾蒙提醒
+            let adviceHTML = "";
+
+            [cite_start]// A. 情感同理 (回應困擾) [cite: 1]
             struggles.forEach(s => {
                 adviceHTML += getStruggleAdvice(s);
             });
 
-            // 4. 目標合理性分析
-            if (goalLoss <= maxSafeLoss + 1.5) {
-                finalWeight = currentWeight - goalLoss;
-                adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦 <strong>${goalLoss}kg</strong> 在 3 個月內是可行的。根據您的數值，透過 ABC 系統的「加法思維」，不需極端節食也能達成。`);
-            } else {
-                const realisticLoss = Math.floor(maxSafeLoss);
-                finalWeight = currentWeight - realisticLoss;
-                isRealistic = false;
-                const extraMonths = Math.ceil(((goalLoss - realisticLoss) / safeWeeklyLoss) / 4);
-                adviceHTML += createAdviceCard("⚠️", "教練的專業建議", `您的決心很強大！但為了不讓身體反撲，前 3 個月我們先穩瘦 <strong>${realisticLoss}kg</strong>。剩下的目標建議再多花 <strong>${extraMonths} 個月</strong>，這才是瘦一輩子的方式。`, true);
-            }
-
-            // 5. 矩陣交叉建議
+            // B. 核心交叉矩陣 (體脂/BMI x 飲食)
+            // 若無體脂數據，使用 BMI 作為替代判斷
             const heightM = height / 100;
             const bmi = currentWeight / (heightM * heightM);
-            let bmiStatus = bmi < 18.5 ? "underweight" : (bmi >= 24 ? "overweight" : "normal");
-
-            // 年齡 x 性別
-            if (age >= 35) {
-                const hormoneText = gender === 'Female' ? "荷爾蒙變化" : "身體代謝效率下降";
-                adviceHTML += createAdviceCard("⏳", "代謝與年齡分析", `到了 ${age} 歲，${hormoneText} 讓「少吃」反而會讓代謝更差。ABC 系統會教您如何「吃夠營養」來啟動身體的燃脂引擎。`);
+            
+            // 定義高體脂標準: 女 > 30%, 男 > 25% 或 BMI > 24
+            let isHighBodyFat = false;
+            if (currentBodyFat) {
+                if (gender === 'Female' && currentBodyFat > 30) isHighBodyFat = true;
+                else if (gender === 'Male' && currentBodyFat > 25) isHighBodyFat = true;
+            } else {
+                if (bmi >= 24) isHighBodyFat = true;
             }
 
-            // 體重 x 體脂
-            if (bmiStatus === 'normal' && currentBodyFat > 30 && gender === 'Female') {
-                adviceHTML += createAdviceCard("🔥", "隱形肥胖注意", `雖然體重正常，但體脂率偏高。重點不是看體重計的數字，而是透過飲食調整，把脂肪換成緊實的線條。`);
-            } else if (bmiStatus === 'overweight' && !struggles.includes('health')) {
-                // 如果困擾已經選了健康，這裡就不重複顯示
-                adviceHTML += createAdviceCard("🩺", "健康優先", `目前的 BMI 顯示身體負擔較大。我們的首要目標是降低內臟脂肪，瘦下來將是健康的自然附加價值。`);
+            // 判斷四大畫像
+            let strategyTitle = "";
+            let strategyContent = "";
+            let proteinText = "";
+
+            if (isHighBodyFat && (dietType === 'out' || dietType === 'mix')) {
+                // 畫像 I: 挑戰者 (高體脂 + 外食)
+                strategyTitle = "🔥 挑戰者策略：外食風險規避";
+                strategyContent = `
+                    <p>您的目標是大幅減脂，但外食環境充滿隱形熱量。核心策略是<strong>「風險規避」</strong>：</p>
+                    <ul>
+                        <li><span class="highlight-term">熱量赤字</span>：建議每日減少 300-500 大卡。</li>
+                        <li><span class="highlight-term">嚴格篩選</span>：選擇清蒸、烤、煮的料理，醬汁另外放，嚴禁含糖飲料（液體糖果）。</li>
+                        <li><span class="highlight-term">主動控制</span>：飯吃一半，青菜吃兩倍。</li>
+                    </ul>`;
+            } else if (isHighBodyFat && dietType === 'cook') {
+                // 畫像 II: 高效率者 (高體脂 + 自煮)
+                strategyTitle = "⚡ 高效率者策略：最大化食物生熱效應";
+                strategyContent = `
+                    <p>您擁有自煮的絕佳優勢！這能讓減脂效率最大化。核心策略是<strong>「精確控制」</strong>：</p>
+                    <ul>
+                        <li><span class="highlight-term">高蛋白膳食</span>：建議攝取 1.6-2.2g/kg 蛋白質，利用蛋白質的高生熱效應 (TEF) 燃燒更多熱量。</li>
+                        <li><span class="highlight-term">內臟脂肪狙擊</span>：減少精緻澱粉，多吃原型食物。</li>
+                    </ul>`;
+            } else if (!isHighBodyFat && (dietType === 'out' || dietType === 'mix')) {
+                // 畫像 III: 優化挑戰者 (標準體脂 + 外食) - 隱形肥胖/體態雕塑
+                strategyTitle = "💎 體態優化策略：品質優先";
+                strategyContent = `
+                    <p>您的體重標準，但希望線條更好。外食族重點在於<strong>「營養品質」</strong>而非單純少吃：</p>
+                    <ul>
+                        <li><span class="highlight-term">微熱量赤字</span>：每日減少約 200 大卡即可，避免肌肉流失。</li>
+                        <li><span class="highlight-term">蛋白質優先</span>：每餐確保掌心大小的蛋白質，這是長肌肉的關鍵。</li>
+                    </ul>`;
+            } else {
+                // 畫像 IV: 頂級優化者 (標準體脂 + 自煮)
+                strategyTitle = "🚀 極致優化策略：週期化營養";
+                strategyContent = `
+                    <p>您具備最佳的體態雕塑條件。核心策略是<strong>「週期化調整」</strong>：</p>
+                    <ul>
+                        <li><span class="highlight-term">碳水循環</span>：訓練日多吃碳水，休息日少吃碳水，維持代謝靈活度。</li>
+                        <li><span class="highlight-term">漸進式負荷</span>：飲食需配合高強度的訓練課表，吃是為了練得更好。</li>
+                    </ul>`;
+            }
+            
+            adviceHTML += createAdviceCard("📊", strategyTitle, strategyContent, "strategy");
+
+            // C. 運動頻率與類型修正建議
+            let exAdvice = "";
+            let needRT = true;
+            
+            // 判斷是否已經有做重訓
+            if (exerciseTypes.includes('strength')) needRT = false;
+
+            if (needRT) {
+                exAdvice += `<p><strong>⚠️ 關鍵修正：加入肌力訓練 (RT)</strong><br>肌肉是身體的「代謝引擎」，每增加 1 公斤肌肉，每天額外消耗 13 大卡。單純少吃會讓基礎代謝率 (BMR) 下降，建議每週至少 2-3 次阻力訓練（如深蹲）來保留肌肉。</p>`;
+            } else {
+                exAdvice += `<p><strong>✅ 優勢維持：肌力訓練</strong><br>您已經在做阻力訓練，這非常棒！這能防止代謝下降。建議每週 3-4 次，並確保重量有循序漸進增加 (漸進式超負荷)。</p>`;
             }
 
-            // 飲食 x 運動
-            if (dietType === 'out' && exerciseFreq === 'active' && !struggles.includes('busy')) {
-                 adviceHTML += createAdviceCard("🍱", "關鍵盲點提醒", `您運動量大卻外食為主？這常是「練得很辛苦卻瘦不下來」的原因！ABC 營養系統會教您在外食中補充「修復肌肉需要的營養」。`);
-            } else if (exerciseFreq === 'none' && !struggles.includes('busy')) {
-                adviceHTML += createAdviceCard("🚶", "活動量策略", `沒時間運動沒關係！ABC 系統強調「NEAT (非運動性熱量消耗)」。我們會教您如何利用零碎時間增加消耗，不用上健身房也能瘦。`);
+            if (exerciseFreq === 'none' || exerciseFreq === 'light') {
+                exAdvice += `<p><strong>🚶 啟動 NEAT (非運動性熱量消耗)</strong><br>對於活動量較少的您，從每天走路 3000 步開始，逐步提升到 7000 步。這些日常活動累積的熱量消耗非常可觀！</p>`;
+            } else if (exerciseTypes.includes('cardio') && !isHighBodyFat) {
+                 exAdvice += `<p><strong>🔥 進階建議：HIIT</strong><br>您的體脂標準，可嘗試高強度間歇訓練 (HIIT) 來產生後燃效應，突破減脂停滯期。</p>`;
             }
+
+            // 瑜珈/伸展的補充
+            if (exerciseTypes.includes('yoga') || struggles.includes('health')) {
+                exAdvice += `<p><strong>🧘 身心平衡</strong><br>瑜珈與伸展有助於降低壓力荷爾蒙，這對減少腹部脂肪堆積很有幫助。</p>`;
+            }
+
+            adviceHTML += createAdviceCard("👟", "運動策略與修正", exAdvice);
+
+            // D. 年齡與性別修正
+            if (age >= 40) {
+                adviceHTML += createAdviceCard("⏳", "40+ 代謝維護", 
+                `隨著年齡增長，肌少症風險增加。對於 40 歲以上的您，<strong>「肌力訓練」比「有氧」更重要</strong>。熱量赤字應保守 (300 kcal)，避免代謝補償效應。`);
+            }
+            
+            if (gender === 'Female') {
+                 // 針對女性的溫馨提醒
+                 // 不特別顯示卡片，除非有特定邏輯，避免資訊過載，這裡融入到結尾或不顯示
+            }
+
+            // E. 荷爾蒙調節 (睡眠/壓力) - 必顯示
+            adviceHTML += createAdviceCard("🌙", "被忽略的減重關鍵：荷爾蒙", 
+            `<p>減重不只是算熱量，更是荷爾蒙的遊戲。</p>
+            <ul>
+                <li><span class="highlight-term">睡眠</span>：睡滿 7-9 小時。睡眠不足會讓飢餓素 (Ghrelin) 暴增，讓您忍不住想吃高熱量食物。</li>
+                <li><span class="highlight-term">壓力</span>：高壓會分泌皮質醇，導致脂肪容易囤積在腹部。請務必給自己放鬆的時間。</li>
+            </ul>`, "hormone");
 
             document.getElementById('adviceContainer').innerHTML = adviceHTML;
 
-            // 6. 圖表繪製
+            // 3. 圖表繪製 (邏輯保持)
+            const safeWeeklyLoss = currentWeight * 0.009; 
+            const maxSafeLoss = safeWeeklyLoss * 12; // 12週
+            
+            let finalWeight;
+            if (goalLoss <= maxSafeLoss + 1.5) {
+                finalWeight = currentWeight - goalLoss;
+            } else {
+                finalWeight = currentWeight - Math.floor(maxSafeLoss);
+            }
+
             const ctx = document.getElementById('weightChart').getContext('2d');
             const totalLoss = currentWeight - finalWeight;
             const w1 = currentWeight - (totalLoss * 0.45);
@@ -457,107 +529,44 @@
                 }
             });
 
-            // 7. LINE 連結
+            // 4. LINE 連結
             const lineId = "@YourLineID"; 
-            
-            // 處理複選的困擾文字
             let struggleTexts = struggles.map(s => {
-                if(s === 'confidence') return "體重沒自信";
-                if(s === 'health') return "擔心健康";
-                if(s === 'yoyo') return "復胖挫折";
+                if(s === 'confidence') return "沒自信";
+                if(s === 'health') return "健康紅字";
+                if(s === 'yoyo') return "復胖";
                 if(s === 'busy') return "外食困擾";
                 return s;
             }).join('+');
 
             let lineMsg = `哈囉！我是${nickname}，${age}歲${gender==='Female'?'女生':'男生'}。\n身高${height}/體重${currentWeight}/想瘦${goalLoss}kg\n主要困擾：${struggleTexts}`;
-            if(currentBodyFat) lineMsg += `\n目前體脂${currentBodyFat}%`;
+            if(currentBodyFat) lineMsg += `\n體脂${currentBodyFat}%`;
             
-            lineMsg += "\n我想索取更多課程資訊！";
+            lineMsg += "\n我想索取完整代謝報告與課程資訊！";
             document.getElementById('lineBtn').href = `https://line.me/R/ti/p/${lineId}?text=${encodeURIComponent(lineMsg)}`;
         }
 
-        // --- 針對困擾的專屬建議生成器 ---
+        // --- 針對困擾的專屬建議生成器 (保持溫暖同理) ---
         function getStruggleAdvice(struggle) {
-            let icon = "";
-            let title = "";
-            let content = "";
-            
+            let icon = ""; let title = ""; let content = "";
             if (struggle === 'confidence') {
-                icon = "❤️";
-                title = "「體重數字讓我沒自信」";
-                content = `
-                    <p>美美也曾經因為體重差點破百而被醫美診所「退貨」，那種挫折感我們都懂。但妳知道嗎？<strong>妳的價值不是由體重的增減來決定的。</strong></p>
-                    <p>我們有很多學員，體重沒有掉很多，但整個人看起來完全不一樣，自信也回來了。因為她們學會了：</p>
-                    <ul>
-                        <li>不是靠意志力硬撐，而是讓身體自然配合</li>
-                        <li>不是拼命少吃，而是學會吃對的東西</li>
-                        <li>不是短期瘦身，而是建立可持續的生活方式</li>
-                    </ul>
-                    <p><strong>「瘦是身體健康後最棒的附加價值」</strong>。ABC系統不只是減重，更有營養師與社群陪伴妳找回自信！</p>
-                `;
+                icon = "❤️"; title = "「體重數字讓我沒自信」";
+                content = `<p>美美也曾經因為體重差點破百而被醫美診所「退貨」，那種挫折感我們都懂。但妳知道嗎？<strong>妳的價值不是由體重的增減來決定的。</strong>我們有很多學員，體重沒有掉很多，但整個人看起來完全不一樣，因為她們學會了建立可持續的生活方式。</p>`;
             } else if (struggle === 'health') {
-                icon = "🩺";
-                title = "「健檢出現紅字，擔心健康」";
-                content = `
-                    <p>妳的擔心很有道理，健康真的是最重要的！體重背後反映的是整體健康狀況。我們有很多學員，一開始也是因為健檢紅字才下定決心改變。</p>
-                    <p>但跟著 ABC 系統 3 個月後，不只體重下降，健康指標也全面改善了。像美美，現在血壓、血脂都恢復正常，脂肪肝也消失了。</p>
-                    <p>ABC 系統提供全面的健康管理：</p>
-                    <ul>
-                        <li>🅰️ A任務：增加好食物，改善營養狀況</li>
-                        <li>🅱️ B任務：建立好習慣，提升代謝健康</li>
-                        <li>🅲️ C任務：減少壞選擇，降低健康風險</li>
-                    </ul>
-                `;
+                icon = "🩺"; title = "「健檢出現紅字，擔心健康」";
+                content = `<p>妳的擔心很有道理，健康真的是最重要的！體重背後反映的是整體健康狀況。跟著 ABC 系統 3 個月後，不只體重下降，血壓、血脂等健康指標通常也能全面改善。瘦下來將是身體健康後最棒的附加價值。</p>`;
             } else if (struggle === 'yoyo') {
-                icon = "📉";
-                title = "「試過很多方法都失敗，復胖很挫折」";
-                content = `
-                    <p>我太懂這種感覺了！美美也說過：「前3年是吃什麼、不吃什麼都不會瘦。」<strong>過去的失敗不是妳的錯，只是妳用錯方法了。</strong></p>
-                    <p>95%的傳統減重方法（節食、藥物）都會復胖，因為它們無法持續一輩子。ABC 系統不一樣：</p>
-                    <ul>
-                        <li>✅ 不靠節食，重點是「刻意加進更多對的東西」</li>
-                        <li>✅ 讓身體自然配合，不需要意志力</li>
-                        <li>✅ 建立可以維持一輩子的生活方式</li>
-                    </ul>
-                    <p>「我們要的是瘦一輩子，而不是瘦一陣子」。</p>
-                `;
+                icon = "📉"; title = "「試過很多方法都失敗，復胖很挫折」";
+                content = `<p>我太懂這種感覺了！<strong>過去的失敗不是妳的錯，只是妳用錯方法了。</strong>95%的傳統減重方法（節食、藥物）都會復胖，因為它們無法持續。ABC 系統不靠意志力，而是重點在「刻意加進更多對的東西」，讓身體自然配合。</p>`;
             } else if (struggle === 'busy') {
-                icon = "🍱";
-                title = "「工作忙碌，外食多，不知道怎麼吃」";
-                content = `
-                    <p>忙碌的生活、外食族的困擾我們完全理解。很多學員都是職場媽媽、上班族，時間真的很有限。</p>
-                    <p>但<strong>「外食不是藉口，而是學會聰明選擇的機會」</strong>！ABC 系統有專門的外食攻略：</p>
-                    <ul>
-                        <li>🅰️ A任務：便當店多點燙青菜，自助餐蛋白質選2-3樣</li>
-                        <li>🅱️ B任務：調整進食順序，先吃菜再吃肉最後吃飯</li>
-                        <li>🅲️ C任務：避開油炸與含糖飲料，少吃飯後甜點</li>
-                    </ul>
-                    <p>我們的營養師團隊每天都會在群組幫學員看外食照片，給妳最即時的個人化建議。</p>
-                `;
+                icon = "🍱"; title = "「工作忙碌，外食多，不知道怎麼吃」";
+                content = `<p>忙碌的生活、外食族的困擾我們完全理解。但<strong>「外食不是藉口，而是學會聰明選擇的機會」</strong>！ABC 系統有專門的外食攻略：便當店多點燙青菜、調整進食順序、避開油炸。我們的營養師團隊會每天幫妳看外食選擇。</p>`;
             }
-
-            // 使用特殊的 empathy 樣式類別
-            return `
-            <div class="analysis-card empathy">
-                <div class="analysis-icon">${icon}</div>
-                <div class="analysis-content">
-                    <h4>${title}</h4>
-                    ${content}
-                </div>
-            </div>`;
+            return `<div class="analysis-card empathy"><div class="analysis-icon">${icon}</div><div class="analysis-content"><h4>${title}</h4>${content}</div></div>`;
         }
 
-        // 一般建議卡片生成器
-        function createAdviceCard(icon, title, text, isWarning = false) {
-            const warningClass = isWarning ? 'warning' : '';
-            return `
-            <div class="analysis-card ${warningClass}">
-                <div class="analysis-icon">${icon}</div>
-                <div class="analysis-content">
-                    <h4>${title}</h4>
-                    <p>${text}</p>
-                </div>
-            </div>`;
+        function createAdviceCard(icon, title, text, type = "") {
+            return `<div class="analysis-card ${type}"><div class="analysis-icon">${icon}</div><div class="analysis-content"><h4>${title}</h4>${text}</div></div>`;
         }
     </script>
 </body>
