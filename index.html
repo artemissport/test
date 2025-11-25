@@ -96,9 +96,9 @@
         }
         
         .analysis-card.empathy { background-color: #f0fdf4; border-left-color: #2E8B57; }
-        .analysis-card.matrix { background-color: #fff; border-left-color: #3498db; } /* 策略藍 */
-        .analysis-card.warning { border-left-color: var(--accent-color); background-color: #fffaf5; }
-        .analysis-card.hormone { background-color: #fcf3f8; border-left-color: #e84393; } /* 荷爾蒙粉 */
+        .analysis-card.matrix { background-color: #fff; border-left-color: #3498db; } 
+        .analysis-card.warning { border-left-color: var(--accent-color); background-color: #fffaf5; } /* 黃色警告卡片 */
+        .analysis-card.hormone { background-color: #fcf3f8; border-left-color: #e84393; } 
         
         .analysis-icon {
             font-size: 2rem; margin-right: 20px; background: #fff;
@@ -367,7 +367,7 @@
             document.getElementById('resultName').innerText = nickname;
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // 2. 建議生成 (使用「調整」取代「控制」，大方向引導) [Cite: User Text Input]
+            // 2. 建議生成
             let adviceHTML = "";
 
             // A. 情感同理 (回應困擾)
@@ -375,9 +375,33 @@
                 adviceHTML += getStruggleAdvice(s);
             });
 
-            // B. 多維度因素交叉矩陣 (四大畫像) [Cite: 多維度因素交叉矩陣：減重調整策略]
+            // B. 目標合理性檢測與建議 (這是關鍵修正，針對 Trend Analysis 的合理性)
+            const safeWeeklyLoss = currentWeight * 0.009; // 約 0.9% 體重
+            const maxSafeLoss = safeWeeklyLoss * 12; // 12週
             
-            // 判斷體脂狀態 (高 vs 標準)
+            let finalWeight;
+            let isRealistic = true;
+            let extraMonths = 0;
+
+            if (goalLoss <= maxSafeLoss + 1.5) {
+                // 目標合理
+                finalWeight = currentWeight - goalLoss;
+                adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦 <strong>${goalLoss}kg</strong> 在 3 個月內是可行的。透過 ABC 系統的「加法思維」，我們很有信心協助您達標！`);
+            } else {
+                // 目標太高，需要調整預期
+                isRealistic = false;
+                const realisticLoss = Math.floor(maxSafeLoss);
+                finalWeight = currentWeight - realisticLoss; // 圖表只畫到合理值
+                const remainingLoss = goalLoss - realisticLoss;
+                extraMonths = Math.ceil((remainingLoss / safeWeeklyLoss) / 4);
+                
+                adviceHTML += createAdviceCard("⚠️", "教練的專業建議", 
+                `您的決心很強大！但為了不讓身體反撲，前 3 個月我們先以<strong>穩瘦 ${realisticLoss}kg</strong> 為目標。
+                剩下的目標建議再多給自己 <strong>${extraMonths} 個月</strong> 的時間。
+                「我們要的是瘦一輩子，而不是瘦一陣子」，這才是最健康的節奏。`, "warning");
+            }
+
+            // C. 多維度因素交叉矩陣 (四大畫像)
             const heightM = height / 100;
             const bmi = currentWeight / (heightM * heightM);
             let isHighBodyFat = false;
@@ -393,7 +417,6 @@
             let strategyContent = "";
 
             if (isHighBodyFat && (dietType === 'out' || dietType === 'mix')) {
-                // I. 挑戰者
                 strategyTitle = "🌱 挑戰者調整策略：風險規避";
                 strategyContent = `
                     <p>您的目標是開始減重，外食環境挑戰較大。我們的核心是<strong>「調整選擇」</strong>而非痛苦節食：</p>
@@ -402,7 +425,6 @@
                         <li><span class="highlight-term">飲食調整</span>：選擇清蒸、烤、煮的料理。減少含糖飲料與油炸物，主動增加蔬菜量。</li>
                     </ul>`;
             } else if (isHighBodyFat && dietType === 'cook') {
-                // II. 高效率者
                 strategyTitle = "⚡ 高效率者調整策略：發揮自煮優勢";
                 strategyContent = `
                     <p>您擁有自煮的優勢，這是減重最強的武器！核心是<strong>「結構調整」</strong>：</p>
@@ -411,7 +433,6 @@
                         <li><span class="highlight-term">飲食調整</span>：增加豆、魚、蛋、肉等優質蛋白質。有意識地調整餐點份量，溫和地減少熱量。</li>
                     </ul>`;
             } else if (!isHighBodyFat && (dietType === 'out' || dietType === 'mix')) {
-                // III. 優化挑戰者
                 strategyTitle = "💎 體態優化策略：品質優先";
                 strategyContent = `
                     <p>您希望線條更緊實。外食族的重點在於<strong>「品質調整」</strong>：</p>
@@ -420,7 +441,6 @@
                         <li><span class="highlight-term">飲食調整</span>：確保足夠的蛋白質來支持肌肉修復。減少「醣油混合物」（如精緻甜點、炸物）的攝取。</li>
                     </ul>`;
             } else {
-                // IV. 頂級優化者
                 strategyTitle = "🚀 極致優化策略：彈性與可持續";
                 strategyContent = `
                     <p>您具備最佳的體態雕塑條件。核心是<strong>「彈性調整」</strong>：</p>
@@ -432,7 +452,7 @@
             
             adviceHTML += createAdviceCard("📊", strategyTitle, strategyContent, "matrix");
 
-            // C. 運動策略的調整與建議 [Cite: 運動策略的調整與建議]
+            // D. 運動策略 (柔性建議)
             let exAdvice = "";
             let exTitle = "👟 運動策略：循序漸進";
 
@@ -444,57 +464,38 @@
                 exAdvice += `<p><strong>🔥 調整內容：包含肌力</strong><br>您的活動量很足夠！請確保訓練菜單中有包含肌力訓練（如深蹲），這能保護代謝引擎。從每週 3 天深蹲 30 下開始嘗試。</p>`;
             }
 
-            // 針對類型的溫馨提醒
             if (exerciseTypes.includes('strength')) {
-                exAdvice += `<p><strong>✅ 肌力訓練</strong>：這是防止代謝下降、長期不復胖的關鍵。選擇深蹲、伏地挺身等能持續執行的動作即可。</p>`;
+                exAdvice += `<p><strong>✅ 肌力訓練</strong>：選擇深蹲、伏地挺身等能持續執行的動作即可。</p>`;
             }
             if (exerciseTypes.includes('cardio')) {
-                exAdvice += `<p><strong>✅ 有氧運動</strong>：提升心肺，輔助熱量消耗。試試「超慢跑」，它就像動態的靜心，跑 10 分鐘也很好。</p>`;
+                exAdvice += `<p><strong>✅ 有氧運動</strong>：試試「超慢跑」，它就像動態的靜心，跑 10 分鐘也很好。</p>`;
             }
             if (exerciseTypes.includes('yoga') || struggles.includes('health')) {
-                exAdvice += `<p><strong>✅ 瑜珈/皮拉提斯</strong>：雖然不是主要燃脂工具，但能幫助伸展與放鬆。安排在睡前 10 分鐘，當作「身體的保養」。</p>`;
-            } else if (!exerciseTypes.length && exerciseFreq !== 'none') {
-                 // 若有頻率但沒選類型，給通用建議
-                 exAdvice += `<p><strong>💡 建議</strong>：可以從簡單的「超慢跑」或「居家深蹲」開始，不需器材也能隨時進行。</p>`;
+                exAdvice += `<p><strong>✅ 瑜珈/皮拉提斯</strong>：安排在睡前 10 分鐘，當作「身體的保養」。</p>`;
             }
 
             adviceHTML += createAdviceCard(exTitle.split(" ")[0], exTitle.split(" ")[1], exAdvice);
 
-            // D. 飲食與其他變數調整 [Cite: 飲食策略的調整與建議]
+            // E. 飲食與代謝微調
             let dietAdvice = "";
-            
-            // 醣油混合物與進食時機 (通用建議)
             dietAdvice += `<p><strong>🍎 醣油混合物</strong>：一週有意識地減少同時高糖又高油（如炸薯條、蛋糕）的次數。想吃甜點時，試著換成天然水果。</p>`;
             dietAdvice += `<p><strong>⏰ 進食時機</strong>：試試「菜 → 肉 → 飯」的順序，這能延緩血糖上升。並嘗試睡前 3-4 小時不吃東西。</p>`;
-
-            // 年齡/體脂特別提醒
             if (age >= 40 || isHighBodyFat) {
-                dietAdvice += `<p><strong>⏳ 代謝維護</strong>：隨著年齡增長或體脂較高，請避免極端低熱量飲食，因為這會傷代謝。記得多喝水，脂肪分解需要水來參與。</p>`;
+                dietAdvice += `<p><strong>⏳ 代謝維護</strong>：避免極端低熱量飲食，因為這會傷代謝。記得多喝水，脂肪分解需要水來參與。</p>`;
             }
-
             adviceHTML += createAdviceCard("🥗", "飲食策略微調", dietAdvice);
 
-            // E. 決定效率的乘數：荷爾蒙 [Cite: 決定減脂效率的「乘數」]
+            // F. 荷爾蒙
             adviceHTML += createAdviceCard("🌙", "被忽略的關鍵：睡眠與壓力", 
             `<p>減重不只是飲食運動，更是荷爾蒙的平衡。</p>
             <ul>
-                <li><span class="highlight-term">充足睡眠</span>：睡眠不足會讓飢餓感上升。試著固定作息，每日睡滿 7 小時，幫助生長荷爾蒙分泌。</li>
+                <li><span class="highlight-term">充足睡眠</span>：睡眠不足會讓飢餓感上升。試著固定作息，每日睡滿 7 小時。</li>
                 <li><span class="highlight-term">壓力管理</span>：壓力會導致腹部脂肪囤積。透過運動、伸展或冥想來放鬆，這是為了走更長遠的路。</li>
             </ul>`, "hormone");
 
             document.getElementById('adviceContainer').innerHTML = adviceHTML;
 
-            // 3. 圖表繪製 (保留原有邏輯，不做變動)
-            const safeWeeklyLoss = currentWeight * 0.009; 
-            const maxSafeLoss = safeWeeklyLoss * 12; 
-            
-            let finalWeight;
-            if (goalLoss <= maxSafeLoss + 1.5) {
-                finalWeight = currentWeight - goalLoss;
-            } else {
-                finalWeight = currentWeight - Math.floor(maxSafeLoss);
-            }
-
+            // 3. 圖表繪製
             const ctx = document.getElementById('weightChart').getContext('2d');
             const totalLoss = currentWeight - finalWeight;
             const w1 = currentWeight - (totalLoss * 0.45);
@@ -530,6 +531,7 @@
 
             let lineMsg = `哈囉！我是${nickname}，${age}歲${gender==='Female'?'女生':'男生'}。\n身高${height}/體重${currentWeight}/想瘦${goalLoss}kg\n主要困擾：${struggleTexts}`;
             if(currentBodyFat) lineMsg += `\n體脂${currentBodyFat}%`;
+            if(!isRealistic) lineMsg += `\n(系統建議調整目標，先設定3個月瘦${(currentWeight-finalWeight).toFixed(1)}kg)`;
             
             lineMsg += "\n我想索取完整調整報告與課程資訊！";
             document.getElementById('lineBtn').href = `https://line.me/R/ti/p/${lineId}?text=${encodeURIComponent(lineMsg)}`;
