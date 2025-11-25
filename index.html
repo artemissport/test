@@ -360,7 +360,6 @@
                 return;
             }
 
-            // 防呆
             if (targetWeight >= currentWeight) {
                 alert("目標體重需要小於目前體重喔！");
                 return;
@@ -377,15 +376,17 @@
             // 建議內容組合
             let adviceHTML = "";
 
-            // A. 目標 BMI 檢測 (新增：若目標過輕，最優先顯示)
-            // BMI = kg / m^2
-            const targetBMI = targetWeight / ((height/100) * (height/100));
+            // A. 目標 BMI 檢測 (體重過輕提醒)
+            const heightM = height / 100;
+            const targetBMI = targetWeight / (heightM * heightM);
+            const minHealthyWeight = (18.5 * heightM * heightM).toFixed(1); // BMI 18.5 的體重
             
             if (targetBMI < 18.5) {
-                adviceHTML += createAdviceCard("❤️", "溫馨提醒：健康比數字更重要",
-                `您設定的目標體重會讓 BMI 低於 18.5，這屬於<strong>體重過輕</strong>喔！<br>
-                ABC 瘦身法的核心理念是<strong>「瘦是身體健康後的附加價值」</strong>。過輕可能會影響免疫力、荷爾蒙與代謝健康。<br>
-                建議您將焦點轉向<strong>「增肌塑形」</strong>，追求緊實的線條而非更低的體重數字。`, "warning");
+                // 提供健康目標建議
+                adviceHTML += createAdviceCard("⚠️", "來自教練的專業建議",
+                `您設定的目標體重會讓 BMI 低於 18.5，這屬於<strong>體重過輕</strong>範圍喔！<br>
+                依據您的身高，<strong>健康的理想體重建議至少為 ${minHealthyWeight} kg</strong> (BMI 18.5)。<br>
+                ABC 瘦身法強調「瘦是身體健康後的附加價值」。建議您先將目標調整至 <strong>${minHealthyWeight} kg</strong>，並透過「增肌塑形」讓視覺線條更緊實好看，而不是單純追求過低的數字。`, "warning");
             }
 
             // B. 目標合理性分析 (速度/時間)
@@ -396,23 +397,31 @@
             let isRealistic = true;
             let extraMonths = 0;
 
+            // 如果目標已經不健康(過輕)，這裡的判斷還是會跑，但上面的警告已經是最重要的了
+            // 這裡主要判斷「時間」是否足夠
+            
             if (goalLoss <= maxSafeLoss + 1.5) {
+                // 時間合理
                 finalWeight = targetWeight;
-                // 若 BMI 正常且目標合理，顯示綠色鼓勵
+                // 只有在目標BMI正常的情況下，才給予綠色肯定，避免與上方的警告衝突
                 if (targetBMI >= 18.5) {
                     adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦到 <strong>${targetWeight}kg</strong> (減${goalLoss.toFixed(1)}kg) 在 3 個月內是可行的。透過 ABC 系統的「加法思維」，我們很有信心協助您達標！`);
                 }
             } else {
+                // 時間太趕
                 isRealistic = false;
                 const realisticLoss = Math.floor(maxSafeLoss);
-                finalWeight = currentWeight - realisticLoss;
+                finalWeight = currentWeight - realisticLoss; 
                 const remainingLoss = goalLoss - realisticLoss;
                 extraMonths = Math.ceil((remainingLoss / safeWeeklyLoss) / 4);
                 
-                adviceHTML += createAdviceCard("⚠️", "教練的專業建議", 
-                `您的決心很強大！但為了不讓身體反撲，前 3 個月我們先以<strong>穩瘦 ${realisticLoss}kg (體重 ${finalWeight}kg)</strong> 為目標。
-                剩下的目標建議再多給自己 <strong>${extraMonths} 個月</strong> 的時間。
-                「我們要的是瘦一輩子，而不是瘦一陣子」，這才是最健康的節奏。`, "warning");
+                // 如果還沒顯示過輕警告，才顯示進度警告
+                if (targetBMI >= 18.5) {
+                    adviceHTML += createAdviceCard("⚠️", "教練的專業建議：分階段目標", 
+                    `您的決心很強大！但為了不讓身體反撲，前 3 個月我們先以<strong>穩瘦 ${realisticLoss}kg (體重 ${finalWeight}kg)</strong> 為目標。
+                    剩下的目標建議再多給自己 <strong>${extraMonths} 個月</strong> 的時間。
+                    「我們要的是瘦一輩子，而不是瘦一陣子」，這才是最健康的節奏。`, "warning");
+                }
             }
 
             // C. 情感同理 (回應困擾)
@@ -420,8 +429,7 @@
                 adviceHTML += getStruggleAdvice(s);
             });
 
-            // D. 多維度因素交叉矩陣 (四大畫像) - 修正標題
-            const heightM = height / 100;
+            // D. 多維度因素交叉矩陣
             const bmi = currentWeight / (heightM * heightM);
             let isHighBodyFat = false;
             
@@ -436,7 +444,6 @@
             let strategyContent = "";
 
             if (isHighBodyFat && (dietType === 'out' || dietType === 'mix')) {
-                // 修正：外食聰明擇食
                 strategyTitle = "🌱 挑戰者調整策略：外食聰明擇食";
                 strategyContent = `
                     <p>您的目標是開始減重，外食環境挑戰較大。我們的核心是<strong>「學會選擇」</strong>而非痛苦節食：</p>
@@ -472,7 +479,7 @@
             
             adviceHTML += createAdviceCard("📊", strategyTitle, strategyContent, "matrix");
 
-            // E. 運動策略 (柔性建議)
+            // E. 運動策略
             let exAdvice = "";
             let exTitle = "👟 運動策略：循序漸進";
 
@@ -484,7 +491,6 @@
                 exAdvice += `<p><strong>🔥 調整內容：包含肌力</strong><br>您的活動量很足夠！請確保訓練菜單中有包含肌力訓練（如深蹲），這能保護代謝引擎。從每週 3 天深蹲 30 下開始嘗試。</p>`;
             }
 
-            // 修正：伏地挺身 -> 核心訓練, 瑜珈 -> 伸展放鬆
             if (exerciseTypes.includes('strength')) {
                 exAdvice += `<p><strong>✅ 肌力訓練</strong>：選擇深蹲、核心訓練等能持續執行的動作即可。</p>`;
             }
@@ -492,7 +498,7 @@
                 exAdvice += `<p><strong>✅ 有氧運動</strong>：試試「超慢跑」，它就像動態的靜心，跑 10 分鐘也很好。</p>`;
             }
             if (exerciseTypes.includes('yoga') || struggles.includes('health')) {
-                exAdvice += `<p><strong>✅ 伸展放鬆</strong>：安排在睡前 10 分鐘，當作「身體的保養」。</p>`;
+                exAdvice += `<p><strong>✅ 伸展</strong>：安排在睡前 10 分鐘，當作「身體的保養」。</p>`;
             }
 
             adviceHTML += createAdviceCard(exTitle.split(" ")[0], exTitle.split(" ")[1], exAdvice);
@@ -552,13 +558,13 @@
 
             let lineMsg = `哈囉！我是${nickname}，${age}歲${gender==='Female'?'女生':'男生'}。\n身高${height}/體重${currentWeight}/想瘦到${targetWeight}kg\n主要困擾：${struggleTexts}`;
             if(currentBodyFat) lineMsg += `\n體脂${currentBodyFat}%`;
-            if(!isRealistic) lineMsg += `\n(系統建議調整目標，先設定3個月瘦${(currentWeight-finalWeight).toFixed(1)}kg)`;
+            if(!isRealistic) lineMsg += `\n(系統建議先設定3個月瘦${(currentWeight-finalWeight).toFixed(1)}kg)`;
             
             lineMsg += "\n我想索取完整調整報告與課程資訊！";
             document.getElementById('lineBtn').href = `https://line.me/R/ti/p/${lineId}?text=${encodeURIComponent(lineMsg)}`;
         }
 
-        // --- 針對困擾的專屬建議生成器 (已全面改為 "您") ---
+        // --- 針對困擾的專屬建議生成器 ---
         function getStruggleAdvice(struggle) {
             let icon = ""; let title = ""; let content = "";
             if (struggle === 'confidence') {
