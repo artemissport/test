@@ -296,7 +296,7 @@
 
         <div class="card" id="resultSection">
             <div class="result-header">
-                <h2><span id="resultName"></span>，您的評估與建議報告</h2>
+                <h2><span id="resultName"></span>，您的調整與建議報告</h2>
                 <p>基於 ABC 瘦身法核心：不靠意志力，而是調整生活</p>
             </div>
 
@@ -347,9 +347,7 @@
             const age = parseFloat(document.getElementById('age').value);
             const height = parseFloat(document.getElementById('height').value);
             const currentWeight = parseFloat(document.getElementById('currentWeight').value);
-            // 取得目標體重
             const targetWeight = parseFloat(document.getElementById('targetWeight').value);
-            
             const currentBodyFat = parseFloat(document.getElementById('currentBodyFat').value);
             const dietType = document.querySelector('input[name="diet"]:checked')?.value;
             const exerciseFreq = document.querySelector('input[name="freq"]:checked')?.value;
@@ -362,13 +360,12 @@
                 return;
             }
 
-            // 防呆：目標體重必須小於目前體重
+            // 防呆
             if (targetWeight >= currentWeight) {
-                alert("目標體重需要小於目前體重，才能進行減重計畫喔！");
+                alert("目標體重需要小於目前體重喔！");
                 return;
             }
 
-            // 計算想瘦公斤數
             const goalLoss = currentWeight - targetWeight;
 
             // 轉場
@@ -380,23 +377,35 @@
             // 建議內容組合
             let adviceHTML = "";
 
-            // A. 目標合理性分析 (最優先顯示)
-            const safeWeeklyLoss = currentWeight * 0.009; // 約 0.9% 體重
-            const maxSafeLoss = safeWeeklyLoss * 12; // 12週
+            // A. 目標 BMI 檢測 (新增：若目標過輕，最優先顯示)
+            // BMI = kg / m^2
+            const targetBMI = targetWeight / ((height/100) * (height/100));
+            
+            if (targetBMI < 18.5) {
+                adviceHTML += createAdviceCard("❤️", "溫馨提醒：健康比數字更重要",
+                `您設定的目標體重會讓 BMI 低於 18.5，這屬於<strong>體重過輕</strong>喔！<br>
+                ABC 瘦身法的核心理念是<strong>「瘦是身體健康後的附加價值」</strong>。過輕可能會影響免疫力、荷爾蒙與代謝健康。<br>
+                建議您將焦點轉向<strong>「增肌塑形」</strong>，追求緊實的線條而非更低的體重數字。`, "warning");
+            }
+
+            // B. 目標合理性分析 (速度/時間)
+            const safeWeeklyLoss = currentWeight * 0.009; 
+            const maxSafeLoss = safeWeeklyLoss * 12; 
             
             let finalWeight;
             let isRealistic = true;
             let extraMonths = 0;
 
             if (goalLoss <= maxSafeLoss + 1.5) {
-                // 合理
-                finalWeight = targetWeight; // 使用目標體重
-                adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦到 <strong>${targetWeight}kg</strong> (減${goalLoss.toFixed(1)}kg) 在 3 個月內是可行的。透過 ABC 系統的「加法思維」，我們很有信心協助您達標！`);
+                finalWeight = targetWeight;
+                // 若 BMI 正常且目標合理，顯示綠色鼓勵
+                if (targetBMI >= 18.5) {
+                    adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦到 <strong>${targetWeight}kg</strong> (減${goalLoss.toFixed(1)}kg) 在 3 個月內是可行的。透過 ABC 系統的「加法思維」，我們很有信心協助您達標！`);
+                }
             } else {
-                // 不合理，提供調整建議
                 isRealistic = false;
                 const realisticLoss = Math.floor(maxSafeLoss);
-                finalWeight = currentWeight - realisticLoss; // 圖表畫到這裡
+                finalWeight = currentWeight - realisticLoss;
                 const remainingLoss = goalLoss - realisticLoss;
                 extraMonths = Math.ceil((remainingLoss / safeWeeklyLoss) / 4);
                 
@@ -406,12 +415,12 @@
                 「我們要的是瘦一輩子，而不是瘦一陣子」，這才是最健康的節奏。`, "warning");
             }
 
-            // B. 情感同理 (回應困擾) - 使用 "您"
+            // C. 情感同理 (回應困擾)
             struggles.forEach(s => {
                 adviceHTML += getStruggleAdvice(s);
             });
 
-            // C. 多維度因素交叉矩陣 (四大畫像)
+            // D. 多維度因素交叉矩陣 (四大畫像) - 修正標題
             const heightM = height / 100;
             const bmi = currentWeight / (heightM * heightM);
             let isHighBodyFat = false;
@@ -427,9 +436,10 @@
             let strategyContent = "";
 
             if (isHighBodyFat && (dietType === 'out' || dietType === 'mix')) {
-                strategyTitle = "🌱 挑戰者調整策略：聰明擇食";
+                // 修正：外食聰明擇食
+                strategyTitle = "🌱 挑戰者調整策略：外食聰明擇食";
                 strategyContent = `
-                    <p>您的目標是開始減重，外食環境挑戰較大。我們的核心是<strong>「調整選擇」</strong>而非痛苦節食：</p>
+                    <p>您的目標是開始減重，外食環境挑戰較大。我們的核心是<strong>「學會選擇」</strong>而非痛苦節食：</p>
                     <ul>
                         <li><span class="highlight-term">運動調整</span>：增加日常活動量 (NEAT)，例如多走路。開始嘗試簡單的肌力訓練。</li>
                         <li><span class="highlight-term">飲食調整</span>：選擇清蒸、烤、煮的料理。減少含糖飲料與油炸物，主動增加蔬菜量。</li>
@@ -462,7 +472,7 @@
             
             adviceHTML += createAdviceCard("📊", strategyTitle, strategyContent, "matrix");
 
-            // D. 運動策略 (柔性建議)
+            // E. 運動策略 (柔性建議)
             let exAdvice = "";
             let exTitle = "👟 運動策略：循序漸進";
 
@@ -474,6 +484,7 @@
                 exAdvice += `<p><strong>🔥 調整內容：包含肌力</strong><br>您的活動量很足夠！請確保訓練菜單中有包含肌力訓練（如深蹲），這能保護代謝引擎。從每週 3 天深蹲 30 下開始嘗試。</p>`;
             }
 
+            // 修正：伏地挺身 -> 核心訓練, 瑜珈 -> 伸展放鬆
             if (exerciseTypes.includes('strength')) {
                 exAdvice += `<p><strong>✅ 肌力訓練</strong>：選擇深蹲、核心訓練等能持續執行的動作即可。</p>`;
             }
@@ -486,7 +497,7 @@
 
             adviceHTML += createAdviceCard(exTitle.split(" ")[0], exTitle.split(" ")[1], exAdvice);
 
-            // E. 飲食與代謝
+            // F. 飲食與代謝
             let dietAdvice = "";
             dietAdvice += `<p><strong>🍎 醣油混合物</strong>：一週有意識地減少同時高糖又高油（如炸薯條、蛋糕）的次數。想吃甜點時，試著換成天然水果。</p>`;
             dietAdvice += `<p><strong>⏰ 進食時機</strong>：試試「菜 → 肉 → 飯」的順序，這能延緩血糖上升。並嘗試睡前 3-4 小時不吃東西。</p>`;
@@ -495,7 +506,7 @@
             }
             adviceHTML += createAdviceCard("🥗", "飲食策略微調", dietAdvice);
 
-            // F. 荷爾蒙
+            // G. 荷爾蒙
             adviceHTML += createAdviceCard("🌙", "被忽略的關鍵：睡眠與壓力", 
             `<p>減重不只是飲食運動，更是荷爾蒙的平衡。</p>
             <ul>
@@ -547,7 +558,7 @@
             document.getElementById('lineBtn').href = `https://line.me/R/ti/p/${lineId}?text=${encodeURIComponent(lineMsg)}`;
         }
 
-        // --- 針對困擾的專屬建議生成器 ---
+        // --- 針對困擾的專屬建議生成器 (已全面改為 "您") ---
         function getStruggleAdvice(struggle) {
             let icon = ""; let title = ""; let content = "";
             if (struggle === 'confidence') {
