@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC 瘦身法 - 您的客製化健康報告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2E8B57; 
+            --primary-dark: #1e5e3a;
+            --secondary-color: #e8f5e9;
+            --accent-color: #e67e22;
+            --text-main: #2c3e50;
+            --bg-body: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0; padding: 0; line-height: 1.6;
+        }
+
+        /* --- Header --- */
+        header {
+            position: relative;
+            background: linear-gradient(rgba(46, 139, 87, 0.9), rgba(30, 94, 58, 0.8)), 
+                        url('https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            color: white; text-align: center; padding: 80px 20px 100px;
+            border-radius: 0 0 50% 50% / 20px;
+        }
+        h1 { margin: 0; font-size: 2.2rem; font-weight: 700; }
+        .subtitle { font-size: 1.1rem; margin-top: 10px; opacity: 0.9; }
+
+        /* --- Container --- */
+        .container { max-width: 720px; margin: -60px auto 40px; padding: 0 20px; position: relative; z-index: 10; }
+        .card { background: #fff; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); margin-bottom: 30px; }
+
+        /* --- Form --- */
+        .form-title h3 { color: var(--primary-color); text-align: center; margin-bottom: 5px; }
+        .form-title p { text-align: center; color: #777; font-size: 0.9rem; margin-bottom: 30px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .optional-tag { font-size: 0.8rem; color: #999; font-weight: normal; margin-left: 5px; }
+        
+        .input-row { display: flex; gap: 15px; }
+        .input-row .form-group { flex: 1; }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 12px;
+            font-size: 1rem; background-color: #fcfcfc; box-sizing: border-box; transition: all 0.3s;
+        }
+        input:focus { border-color: var(--primary-color); outline: none; background-color: #fff; }
+
+        /* --- Radio & Checkbox --- */
+        .radio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .radio-grid-2 { grid-template-columns: repeat(2, 1fr); } 
+
+        .radio-option {
+            border: 2px solid #e0e0e0; border-radius: 12px; padding: 12px 5px; text-align: center;
+            cursor: pointer; transition: all 0.2s; background: #fff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .radio-option:hover { border-color: var(--primary-color); background-color: var(--secondary-color); }
+        
+        /* 選中樣式 */
+        .radio-option.selected {
+            border-color: var(--primary-color); background-color: var(--secondary-color);
+            color: var(--primary-color); font-weight: bold;
+        }
+        .radio-icon { font-size: 1.4rem; margin-bottom: 5px; display: block; }
+        .radio-option input { display: none; }
+
+        /* 重點輸入框 */
+        .highlight-input input {
+            border-color: var(--primary-color); background-color: #f0fdf4; font-weight: bold; color: var(--primary-dark);
+        }
+
+        /* --- Button --- */
+        .btn-submit {
+            width: 100%; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white; border: none; padding: 16px; font-size: 1.2rem; font-weight: 700; border-radius: 50px;
+            cursor: pointer; margin-top: 20px; box-shadow: 0 10px 20px rgba(46, 139, 87, 0.25);
+            transition: transform 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-2px); }
+
+        /* --- Result Section --- */
+        #resultSection { display: none; }
+        .result-header { text-align: center; margin-bottom: 30px; }
+        .result-header h2 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .chart-box { height: 320px; margin-bottom: 30px; }
+
+        /* 分析卡片樣式 */
+        .analysis-card {
+            background: #fff; border-radius: 16px; padding: 20px; margin-bottom: 20px;
+            border-left: 5px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            display: flex; align-items: flex-start;
+        }
+        .analysis-card.warning { border-left-color: var(--accent-color); background-color: #fffaf5; }
+        .analysis-icon {
+            font-size: 1.8rem; margin-right: 15px; background: var(--secondary-color);
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .analysis-content h4 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.1rem; }
+        .analysis-content p { margin: 0; font-size: 0.95rem; color: #555; }
+
+        /* CTA */
+        .cta-area {
+            text-align: center; padding: 30px; background: linear-gradient(135deg, #fff 0%, #f0fdf4 100%);
+            border: 2px dashed var(--primary-color); border-radius: 20px; margin-top: 30px;
+        }
+        .btn-line {
+            background-color: #06C755; color: white; text-decoration: none; display: inline-block;
+            width: 100%; max-width: 400px; padding: 15px 0; border-radius: 50px; font-weight: 700;
+            font-size: 1.1rem; margin-top: 15px; box-shadow: 0 8px 15px rgba(6, 199, 85, 0.3);
+            transition: background 0.3s;
+        }
+        .btn-line:hover { background-color: #05b34c; }
+
+        @media (max-width: 600px) {
+            .input-row { flex-direction: column; gap: 0; }
+            .radio-grid { grid-template-columns: repeat(2, 1fr); }
+            .radio-option { flex-direction: row; justify-content: flex-start; padding: 12px 15px; }
+            .radio-icon { margin: 0 15px 0 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ABC 瘦身法</h1>
+        <div class="subtitle">瘦是健康的附加價值，我們陪你找回自主權</div>
+    </header>
+
+    <div class="container">
+        <div class="card" id="inputForm">
+            <div class="form-title">
+                <h3>建立您的專屬健康檔案</h3>
+                <p>輸入數據，系統將為您運算專屬的 ABC 減重路徑</p>
+            </div>
+            
+            <div class="form-group">
+                <label>怎麼稱呼您？</label>
+                <input type="text" id="nickname" placeholder="例如：Fifi">
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label>性別</label>
+                    <div class="radio-grid radio-grid-2">
+                        <div class="radio-option" onclick="selectRadio(this, 'gender')">
+                            <span>👩 女生</span>
+                            <input type="radio" name="gender" value="Female">
+                        </div>
+                        <div class="radio-option" onclick="selectRadio(this, 'gender')">
+                            <span>👨 男生</span>
+                            <input type="radio" name="gender" value="Male">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>年齡</label>
+                    <input type="number" id="age" placeholder="30">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label>身高 (cm)</label>
+                    <input type="number" id="height" placeholder="160">
+                </div>
+                <div class="form-group">
+                    <label>目前體重 (kg)</label>
+                    <input type="number" id="currentWeight" placeholder="60">
+                </div>
+            </div>
+
+            <div class="form-group highlight-input">
+                <label>請輸入您決心想瘦的公斤數</label>
+                <input type="number" id="goalLoss" placeholder="例如: 8">
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label>目前體脂率 (%) <span class="optional-tag">選填</span></label>
+                    <input type="number" id="currentBodyFat" placeholder="例如: 32">
+                </div>
+                <div class="form-group">
+                    <label>目標體脂率 (%) <span class="optional-tag">選填</span></label>
+                    <input type="number" id="targetBodyFat" placeholder="例如: 24">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>飲食習慣</label>
+                <div class="radio-grid">
+                    <div class="radio-option" onclick="selectRadio(this, 'diet')">
+                        <span class="radio-icon">🍳</span>
+                        <span>幾乎自煮</span>
+                        <input type="radio" name="diet" value="cook">
+                    </div>
+                    <div class="radio-option" onclick="selectRadio(this, 'diet')">
+                        <span class="radio-icon">🍱</span>
+                        <span>外食為主</span>
+                        <input type="radio" name="diet" value="out">
+                    </div>
+                    <div class="radio-option" onclick="selectRadio(this, 'diet')">
+                        <span class="radio-icon">⚖️</span>
+                        <span>一半一半</span>
+                        <input type="radio" name="diet" value="mix">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>運動頻率</label>
+                <div class="radio-grid">
+                    <div class="radio-option" onclick="selectRadio(this, 'freq')">
+                        <span class="radio-icon">🛋️</span>
+                        <span>幾乎不運動</span>
+                        <input type="radio" name="freq" value="none">
+                    </div>
+                    <div class="radio-option" onclick="selectRadio(this, 'freq')">
+                        <span class="radio-icon">🚶</span>
+                        <span>每週 1-2 次</span>
+                        <input type="radio" name="freq" value="light">
+                    </div>
+                    <div class="radio-option" onclick="selectRadio(this, 'freq')">
+                        <span class="radio-icon">🏃</span>
+                        <span>每週 3 次以上</span>
+                        <input type="radio" name="freq" value="active">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>常做的運動類別 <span class="optional-tag">(可複選)</span></label>
+                <div class="radio-grid" id="typeContainer">
+                    <div class="radio-option" onclick="toggleCheckbox(this)">
+                        <span class="radio-icon">💪</span>
+                        <span>肌力/重訓</span>
+                        <input type="checkbox" name="type" value="strength">
+                    </div>
+                    <div class="radio-option" onclick="toggleCheckbox(this)">
+                        <span class="radio-icon">🚴</span>
+                        <span>有氧運動</span>
+                        <input type="checkbox" name="type" value="cardio">
+                    </div>
+                    <div class="radio-option" onclick="toggleCheckbox(this)">
+                        <span class="radio-icon">🧘</span>
+                        <span>瑜珈/皮拉提斯</span>
+                        <input type="checkbox" name="type" value="yoga">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-submit" onclick="analyzeResult()">開始分析我的專屬計畫 ➔</button>
+        </div>
+
+        <div class="card" id="resultSection">
+            <div class="result-header">
+                <h2><span id="resultName"></span>，您的 3 個月潛能分析</h2>
+                <p>ABC 系統大數據運算結果</p>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="weightChart"></canvas>
+            </div>
+
+            <div id="adviceContainer"></div>
+
+            <div class="cta-area">
+                <h3 style="margin: 0;">改變，從現在開始</h3>
+                <p>索取完整報告與您的專屬飲食菜單</p>
+                <a href="#" target="_blank" class="btn-line" id="lineBtn">
+                    加入LINE索取更多課程資訊
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 單選題邏輯
+        function selectRadio(element, groupName) {
+            document.querySelectorAll(`input[name="${groupName}"]`).forEach(input => {
+                input.closest('.radio-option').classList.remove('selected');
+                input.checked = false;
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+        }
+
+        // 複選題邏輯 (Checkbox)
+        function toggleCheckbox(element) {
+            const checkbox = element.querySelector('input');
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                element.classList.add('selected');
+            } else {
+                element.classList.remove('selected');
+            }
+        }
+
+        // 獲取複選值
+        function getCheckedValues(name) {
+            const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        // 核心分析函式
+        function analyzeResult() {
+            // 1. 數據獲取
+            const nickname = document.getElementById('nickname').value || "學員";
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+            const age = parseFloat(document.getElementById('age').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const currentWeight = parseFloat(document.getElementById('currentWeight').value);
+            const goalLoss = parseFloat(document.getElementById('goalLoss').value);
+            const currentBodyFat = parseFloat(document.getElementById('currentBodyFat').value);
+            const targetBodyFat = parseFloat(document.getElementById('targetBodyFat').value);
+            const dietType = document.querySelector('input[name="diet"]:checked')?.value;
+            const exerciseFreq = document.querySelector('input[name="freq"]:checked')?.value;
+            const exerciseTypes = getCheckedValues('type'); // 陣列
+
+            // 驗證
+            if (!currentWeight || !goalLoss || !dietType || !exerciseFreq || !height || !age || !gender) {
+                alert("請填寫完整必填資料，讓我們能提供最準確的分析！");
+                return;
+            }
+
+            // 切換畫面
+            document.getElementById('inputForm').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultName').innerText = nickname;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 2. BMI 計算與狀態判斷
+            const heightM = height / 100;
+            const bmi = currentWeight / (heightM * heightM);
+            let bmiStatus = "";
+            if (bmi < 18.5) bmiStatus = "underweight";
+            else if (bmi >= 24) bmiStatus = "overweight";
+            else bmiStatus = "normal";
+
+            // 3. 減重合理性運算
+            const safeWeeklyLoss = currentWeight * 0.009; 
+            const weeks = 12;
+            const maxSafeLoss = safeWeeklyLoss * weeks;
+            
+            let finalWeight;
+            let adviceHTML = "";
+            let isRealistic = true;
+
+            if (goalLoss <= maxSafeLoss + 1.5) {
+                finalWeight = currentWeight - goalLoss;
+                adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦 <strong>${goalLoss}kg</strong> 在 3 個月內是可行的。根據您的數值，透過 ABC 系統的「加法思維」，不需極端節食也能達成。`);
+            } else {
+                const realisticLoss = Math.floor(maxSafeLoss);
+                finalWeight = currentWeight - realisticLoss;
+                isRealistic = false;
+                const extraMonths = Math.ceil(((goalLoss - realisticLoss) / safeWeeklyLoss) / 4);
+                adviceHTML += createAdviceCard("⚠️", "教練的專業建議", `您的決心很強大！但為了不讓身體反撲，前 3 個月我們先穩瘦 <strong>${realisticLoss}kg</strong>。剩下的目標建議再多花 <strong>${extraMonths} 個月</strong>，這才是瘦一輩子的方式。`, true);
+            }
+
+            // 4. === 深度客製化建議矩陣 (交叉比對邏輯) ===
+
+            // A. 年齡 x 性別分析
+            if (age >= 35) {
+                const hormoneText = gender === 'Female' ? "荷爾蒙變化容易導致代謝變慢" : "身體代謝效率自然下降";
+                adviceHTML += createAdviceCard("⏳", "代謝與年齡分析", `到了 ${age} 歲，${hormoneText}。這時「少吃」反而會讓代謝更差。ABC 系統會教您如何「吃夠營養」來啟動身體的燃脂引擎。`);
+            }
+
+            // B. 體重 x 體脂分析 (如果 BMI 正常但想瘦/或體脂高)
+            if (bmiStatus === 'normal' && currentBodyFat > 30 && gender === 'Female') {
+                adviceHTML += createAdviceCard("🔥", "隱形肥胖注意", `雖然您的體重正常，但體脂率偏高，這就是所謂的「泡芙人」。您的重點不是看體重計的數字，而是透過飲食結構調整，把脂肪換成緊實的線條。`);
+            } else if (bmiStatus === 'overweight') {
+                adviceHTML += createAdviceCard("🩺", "健康優先", `目前的 BMI 顯示身體負擔較大。我們的首要目標是降低內臟脂肪，這能大幅改善您的精神狀態與睡眠品質，瘦下來是健康的附加價值。`);
+            }
+
+            // C. 飲食 x 運動交叉分析
+            if (dietType === 'out' && exerciseFreq === 'active') {
+                adviceHTML += createAdviceCard("🍱", "關鍵盲點提醒", `您運動量很大，卻還是外食為主？這常常是「練得很辛苦卻瘦不下來」的原因！ABC 營養系統會教您如何在外食中補充「修復肌肉需要的營養」，讓您的汗水不白流。`);
+            } else if (exerciseFreq === 'none') {
+                adviceHTML += createAdviceCard("🚶", "活動量策略", `沒時間運動沒關係！ABC 系統強調「NEAT (非運動性熱量消耗)」。我們會教您如何利用零碎時間增加消耗，不用上健身房也能瘦。`);
+            }
+
+            // D. 運動類別分析 (針對複選)
+            if (exerciseTypes.length > 0) {
+                let typeMsg = "您有很好的運動基礎！";
+                if (exerciseTypes.includes('strength')) typeMsg += "搭配肌力訓練，飲食上我們會著重蛋白質配比，幫您留住肌肉。";
+                if (exerciseTypes.includes('yoga')) typeMsg += "瑜珈能很好的調節身心壓力，這對降低皮質醇（壓力肥）非常有幫助。";
+                adviceHTML += createAdviceCard("👟", "運動效能優化", typeMsg);
+            }
+
+            document.getElementById('adviceContainer').innerHTML = adviceHTML;
+
+            // 5. 繪製圖表
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            const totalLoss = currentWeight - finalWeight;
+            const w1 = currentWeight - (totalLoss * 0.45);
+            const w2 = currentWeight - (totalLoss * 0.75);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['現在', '第 1 個月', '第 2 個月', '第 3 個月'],
+                    datasets: [{
+                        label: '預估體重變化 (kg)',
+                        data: [currentWeight, w1, w2, finalWeight],
+                        borderColor: '#2E8B57', backgroundColor: 'rgba(46, 139, 87, 0.1)',
+                        borderWidth: 4, tension: 0.4, fill: true, pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { grid: { color: '#f5f5f5' } }, x: { grid: { display: false } } }
+                }
+            });
+
+            // 6. 生成 LINE 訊息 (包含運動複選結果)
+            const lineId = "@YourLineID"; 
+            let exTypeStr = exerciseTypes.length > 0 ? exerciseTypes.map(t => {
+                if(t==='strength') return '重訓';
+                if(t==='cardio') return '有氧';
+                if(t==='yoga') return '瑜珈';
+                return t;
+            }).join('+') : '無';
+
+            let lineMsg = `哈囉！我是${nickname}，${age}歲${gender==='Female'?'女生':'男生'}。\n身高${height}/體重${currentWeight}/想瘦${goalLoss}kg。`;
+            if(currentBodyFat) lineMsg += `\n目前體脂${currentBodyFat}%`;
+            lineMsg += `\n運動:${exerciseFreq}(${exTypeStr})`;
+            
+            if(!isRealistic) lineMsg += `\n(系統建議我分階段執行，先設定3個月瘦${(currentWeight-finalWeight).toFixed(1)}kg)`;
+            else lineMsg += `\n(系統評估3個月目標可執行)`;
+            
+            lineMsg += "\n我想索取更多課程資訊！";
+
+            document.getElementById('lineBtn').href = `https://line.me/R/ti/p/${lineId}?text=${encodeURIComponent(lineMsg)}`;
+        }
+
+        // 輔助函式：產生建議卡片 HTML
+        function createAdviceCard(icon, title, text, isWarning = false) {
+            const warningClass = isWarning ? 'warning' : '';
+            return `
+            <div class="analysis-card ${warningClass}">
+                <div class="analysis-icon">${icon}</div>
+                <div class="analysis-content">
+                    <h4>${title}</h4>
+                    <p>${text}</p>
+                </div>
+            </div>`;
+        }
+    </script>
+</body>
+</html>
