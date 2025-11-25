@@ -88,7 +88,7 @@
         .result-header h2 { color: var(--primary-color); margin-bottom: 5px; }
         .chart-box { height: 320px; margin-bottom: 30px; }
 
-        /* --- Analysis Card (Matrix Style) --- */
+        /* --- Analysis Card --- */
         .analysis-card {
             background: #fff; border-radius: 16px; padding: 25px; margin-bottom: 25px;
             border-left: 6px solid var(--primary-color); box-shadow: 0 5px 15px rgba(0,0,0,0.05);
@@ -113,7 +113,6 @@
         .analysis-content ul { margin: 5px 0 10px 20px; padding: 0; color: #555; }
         .analysis-content li { margin-bottom: 5px; }
         
-        /* 策略關鍵字高亮 */
         .highlight-term { color: var(--primary-dark); font-weight: bold; background: #e8f5e9; padding: 0 4px; border-radius: 4px; }
 
         /* CTA */
@@ -188,8 +187,8 @@
             </div>
 
             <div class="form-group highlight-input">
-                <label>請輸入您決心想瘦的公斤數</label>
-                <input type="number" id="goalLoss" placeholder="例如: 8">
+                <label>您的目標體重 (kg)</label>
+                <input type="number" id="targetWeight" placeholder="例如: 52">
             </div>
 
             <div class="input-row">
@@ -348,7 +347,9 @@
             const age = parseFloat(document.getElementById('age').value);
             const height = parseFloat(document.getElementById('height').value);
             const currentWeight = parseFloat(document.getElementById('currentWeight').value);
-            const goalLoss = parseFloat(document.getElementById('goalLoss').value);
+            // 取得目標體重
+            const targetWeight = parseFloat(document.getElementById('targetWeight').value);
+            
             const currentBodyFat = parseFloat(document.getElementById('currentBodyFat').value);
             const dietType = document.querySelector('input[name="diet"]:checked')?.value;
             const exerciseFreq = document.querySelector('input[name="freq"]:checked')?.value;
@@ -356,10 +357,19 @@
             const struggles = getCheckedValues('struggle');
 
             // 驗證
-            if (!currentWeight || !goalLoss || !dietType || !exerciseFreq || !height || !age || !gender || struggles.length === 0) {
+            if (!currentWeight || !targetWeight || !dietType || !exerciseFreq || !height || !age || !gender || struggles.length === 0) {
                 alert("請填寫完整資料（包含困擾），以獲得最精準的建議！");
                 return;
             }
+
+            // 防呆：目標體重必須小於目前體重
+            if (targetWeight >= currentWeight) {
+                alert("目標體重需要小於目前體重，才能進行減重計畫喔！");
+                return;
+            }
+
+            // 計算想瘦公斤數
+            const goalLoss = currentWeight - targetWeight;
 
             // 轉場
             document.getElementById('inputForm').style.display = 'none';
@@ -380,8 +390,8 @@
 
             if (goalLoss <= maxSafeLoss + 1.5) {
                 // 合理
-                finalWeight = currentWeight - goalLoss;
-                adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦 <strong>${goalLoss}kg</strong> 在 3 個月內是可行的。透過 ABC 系統的「加法思維」，我們很有信心協助您達標！`);
+                finalWeight = targetWeight; // 使用目標體重
+                adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦到 <strong>${targetWeight}kg</strong> (減${goalLoss.toFixed(1)}kg) 在 3 個月內是可行的。透過 ABC 系統的「加法思維」，我們很有信心協助您達標！`);
             } else {
                 // 不合理，提供調整建議
                 isRealistic = false;
@@ -391,12 +401,12 @@
                 extraMonths = Math.ceil((remainingLoss / safeWeeklyLoss) / 4);
                 
                 adviceHTML += createAdviceCard("⚠️", "教練的專業建議", 
-                `您的決心很強大！但為了不讓身體反撲，前 3 個月我們先以<strong>穩瘦 ${realisticLoss}kg</strong> 為目標。
+                `您的決心很強大！但為了不讓身體反撲，前 3 個月我們先以<strong>穩瘦 ${realisticLoss}kg (體重 ${finalWeight}kg)</strong> 為目標。
                 剩下的目標建議再多給自己 <strong>${extraMonths} 個月</strong> 的時間。
                 「我們要的是瘦一輩子，而不是瘦一陣子」，這才是最健康的節奏。`, "warning");
             }
 
-            // B. 情感同理 (回應困擾) - 改用 "您"
+            // B. 情感同理 (回應困擾) - 使用 "您"
             struggles.forEach(s => {
                 adviceHTML += getStruggleAdvice(s);
             });
@@ -464,16 +474,13 @@
                 exAdvice += `<p><strong>🔥 調整內容：包含肌力</strong><br>您的活動量很足夠！請確保訓練菜單中有包含肌力訓練（如深蹲），這能保護代謝引擎。從每週 3 天深蹲 30 下開始嘗試。</p>`;
             }
 
-            // 修改：運動類型建議優化
             if (exerciseTypes.includes('strength')) {
-                // 伏地挺身 -> 核心訓練
                 exAdvice += `<p><strong>✅ 肌力訓練</strong>：選擇深蹲、核心訓練等能持續執行的動作即可。</p>`;
             }
             if (exerciseTypes.includes('cardio')) {
                 exAdvice += `<p><strong>✅ 有氧運動</strong>：試試「超慢跑」，它就像動態的靜心，跑 10 分鐘也很好。</p>`;
             }
             if (exerciseTypes.includes('yoga') || struggles.includes('health')) {
-                // 瑜珈/皮拉提斯 -> 伸展放鬆
                 exAdvice += `<p><strong>✅ 伸展放鬆</strong>：安排在睡前 10 分鐘，當作「身體的保養」。</p>`;
             }
 
@@ -523,7 +530,7 @@
             });
 
             // 4. LINE 連結
-            const lineId = "@sososo"; 
+            const lineId = "@YourLineID"; 
             let struggleTexts = struggles.map(s => {
                 if(s === 'confidence') return "沒自信";
                 if(s === 'health') return "健康紅字";
@@ -532,7 +539,7 @@
                 return s;
             }).join('+');
 
-            let lineMsg = `哈囉！我是${nickname}，${age}歲${gender==='Female'?'女生':'男生'}。\n身高${height}/體重${currentWeight}/想瘦${goalLoss}kg\n主要困擾：${struggleTexts}`;
+            let lineMsg = `哈囉！我是${nickname}，${age}歲${gender==='Female'?'女生':'男生'}。\n身高${height}/體重${currentWeight}/想瘦到${targetWeight}kg\n主要困擾：${struggleTexts}`;
             if(currentBodyFat) lineMsg += `\n體脂${currentBodyFat}%`;
             if(!isRealistic) lineMsg += `\n(系統建議調整目標，先設定3個月瘦${(currentWeight-finalWeight).toFixed(1)}kg)`;
             
@@ -540,7 +547,7 @@
             document.getElementById('lineBtn').href = `https://line.me/R/ti/p/${lineId}?text=${encodeURIComponent(lineMsg)}`;
         }
 
-        // --- 針對困擾的專屬建議生成器 (改為 "您") [Cite: Source 1, 15 - Warm tone] ---
+        // --- 針對困擾的專屬建議生成器 ---
         function getStruggleAdvice(struggle) {
             let icon = ""; let title = ""; let content = "";
             if (struggle === 'confidence') {
