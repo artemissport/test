@@ -367,15 +367,10 @@
             document.getElementById('resultName').innerText = nickname;
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // 2. 建議生成
+            // 建議內容組合
             let adviceHTML = "";
 
-            // A. 情感同理 (回應困擾)
-            struggles.forEach(s => {
-                adviceHTML += getStruggleAdvice(s);
-            });
-
-            // B. 目標合理性檢測與建議 (這是關鍵修正，針對 Trend Analysis 的合理性)
+            // A. 目標合理性分析 (移到最上方)
             const safeWeeklyLoss = currentWeight * 0.009; // 約 0.9% 體重
             const maxSafeLoss = safeWeeklyLoss * 12; // 12週
             
@@ -384,14 +379,14 @@
             let extraMonths = 0;
 
             if (goalLoss <= maxSafeLoss + 1.5) {
-                // 目標合理
+                // 合理
                 finalWeight = currentWeight - goalLoss;
                 adviceHTML += createAdviceCard("🎯", "目標設定清晰！", `想瘦 <strong>${goalLoss}kg</strong> 在 3 個月內是可行的。透過 ABC 系統的「加法思維」，我們很有信心協助您達標！`);
             } else {
-                // 目標太高，需要調整預期
+                // 不合理，提供調整建議
                 isRealistic = false;
                 const realisticLoss = Math.floor(maxSafeLoss);
-                finalWeight = currentWeight - realisticLoss; // 圖表只畫到合理值
+                finalWeight = currentWeight - realisticLoss; // 圖表畫到這裡
                 const remainingLoss = goalLoss - realisticLoss;
                 extraMonths = Math.ceil((remainingLoss / safeWeeklyLoss) / 4);
                 
@@ -400,6 +395,11 @@
                 剩下的目標建議再多給自己 <strong>${extraMonths} 個月</strong> 的時間。
                 「我們要的是瘦一輩子，而不是瘦一陣子」，這才是最健康的節奏。`, "warning");
             }
+
+            // B. 情感同理 (回應困擾)
+            struggles.forEach(s => {
+                adviceHTML += getStruggleAdvice(s);
+            });
 
             // C. 多維度因素交叉矩陣 (四大畫像)
             const heightM = height / 100;
@@ -452,7 +452,7 @@
             
             adviceHTML += createAdviceCard("📊", strategyTitle, strategyContent, "matrix");
 
-            // D. 運動策略 (柔性建議)
+            // D. 運動策略
             let exAdvice = "";
             let exTitle = "👟 運動策略：循序漸進";
 
@@ -476,7 +476,7 @@
 
             adviceHTML += createAdviceCard(exTitle.split(" ")[0], exTitle.split(" ")[1], exAdvice);
 
-            // E. 飲食與代謝微調
+            // E. 飲食與代謝
             let dietAdvice = "";
             dietAdvice += `<p><strong>🍎 醣油混合物</strong>：一週有意識地減少同時高糖又高油（如炸薯條、蛋糕）的次數。想吃甜點時，試著換成天然水果。</p>`;
             dietAdvice += `<p><strong>⏰ 進食時機</strong>：試試「菜 → 肉 → 飯」的順序，這能延緩血糖上升。並嘗試睡前 3-4 小時不吃東西。</p>`;
